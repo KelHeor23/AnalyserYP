@@ -20,6 +20,13 @@
 namespace analyzer::metric::metric_impl {
 std::string CodeLinesCountMetric::Name() const { return kName; }
 
+static inline int ToInt(std::string_view sv) {
+    int value = 0;
+    auto res = std::from_chars(sv.data(), sv.data() + sv.size(), value);
+    if (res.ec == std::errc()) return value;
+    return 0;
+}
+
 MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
     auto &function_ast = f.ast;
 

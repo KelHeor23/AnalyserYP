@@ -27,7 +27,7 @@
 #include "metric_impl/metrics.hpp"
 
 int main(int argc, char *argv[]) {
-    analyzer::cmd::ProgramOptions options;
+    /*analyzer::cmd::ProgramOptions options;
     if (!options.Parse(argc, argv))
         return 1;
     using namespace analyser::metric::metric_impl;
@@ -99,6 +99,6 @@ int main(int argc, char *argv[]) {
     analyser::AccumulateFunctionAnalysis(analysis, accumulator);
     std::println();
     std::println("Accumulated Analysis for All Functions:");
-    print_accumulated_analysis(accumulator);
+    print_accumulated_analysis(accumulator);*/
     return 0;
 }
