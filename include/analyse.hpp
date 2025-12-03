@@ -41,6 +41,7 @@ namespace rs = std::ranges;
 auto AnalyseFunctions(const std::vector<std::string> &files,
                       const analyzer::metric::MetricExtractor &metric_extractor) {
     // здесь ваш код
+    return std::vector<MetricResult>;
 }
 
 /**
