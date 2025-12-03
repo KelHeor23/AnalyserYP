@@ -44,17 +44,21 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
         "conditional_expression",  // для тернарного оператора
     };
 
-    int complexity = 1;  // базовая сложность
+    auto patterns = complexity_nodes |
+                    std::views::transform([](std::string_view node_type) { return "(" + std::string(node_type); });
 
-    for (auto node : complexity_nodes) {
-        size_t pos = 0;
-        while ((pos = function_ast.find(node, pos)) != std::string::npos) {
-            ++complexity;
-            pos += node.size();
-        }
-    }
+    auto total_complexity =
+        std::ranges::fold_left(patterns 
+            | std::views::transform([&](const std::string &pattern) {
+                size_t count = 0;
+                size_t pos = 0;
+                while ((pos = function_ast.find(pattern, pos)) != std::string::npos) {
+                    ++count;
+                    pos += pattern.length();
+                }
+                return count;
+            }), 0, std::plus<>());
 
-    return complexity;
-
+    return static_cast<MetricResult::ValueType>(total_complexity + 1);
 }
 }  // namespace analyzer::metric::metric_impl
