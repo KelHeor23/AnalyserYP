@@ -22,7 +22,7 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
     // Получаем строковое представление AST (абстрактного синтаксического дерева) функции.
     // Это S-выражение, сгенерированное утилитой tree-sitter, например:
     // "(function_definition name: (identifier) ... (if_statement ...) (for_statement ...))"
-    auto &function_ast = f.ast;
+    std::string_view function_ast = f.ast;
 
     // Список типов узлов AST, каждый из которых увеличивает цикломатическую сложность на 1.
     // Эти узлы соответствуют управляющим конструкциям языка Python:
@@ -46,15 +46,11 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
 
     int complexity = 1;  // базовая сложность
 
-    for (auto node_type : complexity_nodes) {
+    for (auto node : complexity_nodes) {
         size_t pos = 0;
-        while (true) {
-            pos = function_ast.find(node_type, pos);
-            if (pos == std::string::npos)
-                break;
-
+        while ((pos = function_ast.find(node, pos)) != std::string::npos) {
             ++complexity;
-            pos += node_type.size();
+            pos += node.size();
         }
     }
 
