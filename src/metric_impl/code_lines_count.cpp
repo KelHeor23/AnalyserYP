@@ -62,13 +62,13 @@ MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Func
 
         return node_type != "comment";
     };
-    
+
     int code_lines_count = std::ranges::distance(
         std::views::iota(start_line + 1, end_line + 1)
         | std::views::filter([&](int line) { return is_code_line(line); })
     );
 
-    return code_lines_count;                                          std::views::filter([&](int line) { return is_code_line(line); })));
+    return code_lines_count;
 }
 
 }  // namespace analyzer::metric::metric_impl
