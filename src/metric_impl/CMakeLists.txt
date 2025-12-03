@@ -22,3 +22,7 @@ foreach(file IN LISTS test_files)
 endforeach()
 
 add_test(NAME ${target} COMMAND ${target})
+
+target_compile_definitions(${target} PRIVATE
+    TEST_FILES_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+)
