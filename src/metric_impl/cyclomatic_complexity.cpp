@@ -44,26 +44,21 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
         "conditional_expression",  // для тернарного оператора
     };
 
-    // === ВАШ КОД ДОЛЖЕН БЫТЬ ЗДЕСЬ ===
-    //
-    // Цель: подсчитать, сколько раз в строке `function_ast` встречаются
-    // любые из узлов из `complexity_nodes`.
-    //
-    // Важно:
-    // - Имена узлов уникальны и не являются подстроками других имён, поэтому
-    //   поиск подстроки (например, `"if_statement"`) безопасен.
-    // - Каждое вхождение узла = +1 к сложности.
-    // - В конце к общей сумме нужно прибавить 1 (базовая сложность функции без ветвлений).
-    //
-    // Пример:
-    // Если AST содержит "(if_statement ...) (for_statement ...) (if_statement ...)",
-    // то найдено 3 узла → сложность = 3 + 1 = 4.
-    //
-    // Подсказка:
-    // Можно пройтись по каждому `node_type` из `complexity_nodes` и подсчитать,
-    // сколько раз он встречается в `function_ast`, используя `std::string::find`
-    // в цикле (это допустимо, так как вы работаете со строковым представлением AST,
-    // а не с исходным кодом напрямую).
+    int complexity = 1;  // базовая сложность
+
+    for (auto node_type : complexity_nodes) {
+        size_t pos = 0;
+        while (true) {
+            pos = function_ast.find(node_type, pos);
+            if (pos == std::string::npos)
+                break;
+
+            ++complexity;
+            pos += node_type.size();
+        }
+    }
+
+    return complexity;
 
 }
 }  // namespace analyzer::metric::metric_impl
