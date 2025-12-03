@@ -21,7 +21,7 @@ namespace analyzer::metric::metric_impl {
 std::string NamingStyleMetric::Name() const { return kName; }
 
 MetricResult::ValueType NamingStyleMetric::CalculateImpl(const function::Function &f) const {
-    auto &functionName = f.name;
+    std::string_view functionName = f.name;
     bool hasUnderscore = functionName.find('_') != std::string::npos;
     bool hasHyphen = functionName.find('-') != std::string::npos;
     bool hasUpper = std::any_of(functionName.begin(), functionName.end(), [](char c) { return isupper(c); });

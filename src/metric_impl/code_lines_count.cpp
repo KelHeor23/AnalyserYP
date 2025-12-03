@@ -28,7 +28,7 @@ static inline int ToInt(std::string_view sv) {
 }
 
 MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
-    auto &function_ast = f.ast;
+    std::string_view function_ast = f.ast;
 
     // Вспомогательная лямбда для извлечения номера строки из диапазона узла AST.
     // Формат узла в S-выражении: (node_type [start_line,start_column] [end_line,end_column] ...)
