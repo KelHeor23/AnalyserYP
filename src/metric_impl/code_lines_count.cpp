@@ -28,7 +28,7 @@ static inline int ToInt(std::string_view sv) {
 }
 
 MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
-    auto &function_ast = f.ast;
+    std::string_view function_ast = f.ast;
 
     // Вспомогательная лямбда для извлечения номера строки из диапазона узла AST.
     // Формат узла в S-выражении: (node_type [start_line,start_column] [end_line,end_column] ...)
@@ -62,14 +62,13 @@ MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Func
 
         return node_type != "comment";
     };
-    // === ВАШ КОД ДОЛЖЕН БЫТЬ ЗДЕСЬ ===
-    //
-    // Цель: подсчитать количество строк в диапазоне [start_line + 1, end_line],
-    // которые действительно содержат код (а не только комментарии или пустые строки).
-    //
-    // Почему start_line + 1?
-    // Потому что первая строка — это строка с объявлением функции (def ...),
-    // а тело функции начинается со следующей строки (обычно с отступа).                                             std::views::filter([&](int line) { return is_code_line(line); })));
+
+    int code_lines_count = std::ranges::distance(
+        std::views::iota(start_line + 1, end_line + 1)
+        | std::views::filter([&](int line) { return is_code_line(line); })
+    );
+
+    return code_lines_count;
 }
 
 }  // namespace analyzer::metric::metric_impl

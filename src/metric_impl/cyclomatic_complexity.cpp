@@ -22,7 +22,7 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
     // Получаем строковое представление AST (абстрактного синтаксического дерева) функции.
     // Это S-выражение, сгенерированное утилитой tree-sitter, например:
     // "(function_definition name: (identifier) ... (if_statement ...) (for_statement ...))"
-    auto &function_ast = f.ast;
+    std::string_view function_ast = f.ast;
 
     // Список типов узлов AST, каждый из которых увеличивает цикломатическую сложность на 1.
     // Эти узлы соответствуют управляющим конструкциям языка Python:
@@ -44,26 +44,16 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
         "conditional_expression",  // для тернарного оператора
     };
 
-    // === ВАШ КОД ДОЛЖЕН БЫТЬ ЗДЕСЬ ===
-    //
-    // Цель: подсчитать, сколько раз в строке `function_ast` встречаются
-    // любые из узлов из `complexity_nodes`.
-    //
-    // Важно:
-    // - Имена узлов уникальны и не являются подстроками других имён, поэтому
-    //   поиск подстроки (например, `"if_statement"`) безопасен.
-    // - Каждое вхождение узла = +1 к сложности.
-    // - В конце к общей сумме нужно прибавить 1 (базовая сложность функции без ветвлений).
-    //
-    // Пример:
-    // Если AST содержит "(if_statement ...) (for_statement ...) (if_statement ...)",
-    // то найдено 3 узла → сложность = 3 + 1 = 4.
-    //
-    // Подсказка:
-    // Можно пройтись по каждому `node_type` из `complexity_nodes` и подсчитать,
-    // сколько раз он встречается в `function_ast`, используя `std::string::find`
-    // в цикле (это допустимо, так как вы работаете со строковым представлением AST,
-    // а не с исходным кодом напрямую).
+    auto count_node_occurrences = [function_ast](std::string_view node) -> size_t {
+        return std::ranges::distance(std::views::iota(size_t{0}, function_ast.size() - node.size()) |
+                                     std::views::filter([function_ast, node](size_t i) {
+                                         return function_ast[i] == '(' && function_ast.substr(i + 1, node.size()) == node;
+                                     }));
+    };
 
+    auto total = std::ranges::fold_left(complexity_nodes | std::views::transform(count_node_occurrences), size_t{0},
+                                        std::plus{});
+
+    return static_cast<int>(total + 1);
 }
 }  // namespace analyzer::metric::metric_impl
